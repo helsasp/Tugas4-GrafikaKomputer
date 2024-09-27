@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Load 3D GLB</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+
+    <script>
+        // Inisialisasi scene, kamera, dan renderer
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+
+        // Atur ukuran renderer dan latar belakang putih
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setClearColor(0xffffff); // Warna latar belakang putih
+        document.body.appendChild(renderer.domElement);
+
+        // Tambahkan lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(1, 1, 1).normalize();
+        scene.add(directionalLight);
+
+        // Load model GLB menggunakan GLTFLoader
+        const loader = new THREE.GLTFLoader();
+        loader.load('3d.glb', function(gltf) {
+            scene.add(gltf.scene);
+            gltf.scene.position.set(0, 0, 0);
+            gltf.scene.scale.set(1, 1, 1); // Sesuaikan skala model jika perlu
+        }, undefined, function(error) {
+            console.error('Error loading GLB model:', error);
+        });
+
+        // Set posisi kamera
+        camera.position.z = 5;
+
+        // Fungsi animasi untuk merender scene
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Update ukuran viewport saat window di-resize
+        window.addEventListener('resize', function() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            renderer.setSize(width, height);
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+        });
+    </script>
+</body>
+</html>
